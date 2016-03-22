@@ -29,13 +29,13 @@ const
     data = new WeakMap();
 
 class Node {
-    
+
     constructor(value) {
         this.value = value;
         this.children = [];
         this.parent = undefined;
     }
-    
+
     size() {
         return this.children.length +
             this.children.reduce((res, child) =>
@@ -52,7 +52,7 @@ class Node {
         this.children = uniq(concat(this.children, node));
         node.parent = this;
     }
-    
+
     findByName(name) {
         if (this.value && isEqual(this.value.name, name)) {
             return this;
@@ -61,7 +61,7 @@ class Node {
             return child.findByName(name) || result;
         }, undefined);
     }
-    
+
     find(node) {
         if (isEqual(node, this)) {
             return this;
@@ -70,19 +70,19 @@ class Node {
             return child.find(node) || result;
         }, undefined);
     }
-    
+
     toString() {
         let name = this.value && this.value.name || 'root';
         return `${name} : [${this.children.join(', ')}]`;
     }
-    
+
     toJSON() {
         return {
             name: this.value && this.value.name || 'root',
             children: this.children.map(child => child.toJSON())
         };
     }
-    
+
 }
 
 export class DAG {
@@ -111,10 +111,10 @@ export class DAG {
       * });
       */
     constructor(...plugins) {
-        
+
         let root = new Node();
         data.set(this, root);
-        
+
         uniq(flattenDeep(plugins))
             .filter(is(Plugin))
             .map(vertex => new Node(vertex))
@@ -136,7 +136,7 @@ export class DAG {
         });
 
     }
-    
+
     /**
      * Converts the DAG into a dependency-safe sequence of Plugin instances.
      * @function DAG#toArray
@@ -157,7 +157,7 @@ export class DAG {
         this.forEach(append, null, 1);
         return result;
     }
-    
+
     toJSON() {
         return data.get(this).toJSON();
     }
@@ -165,7 +165,7 @@ export class DAG {
     toString() {
         return data.get(this).toString();
     }
-    
+
     /**
      * Iterates through the DAG in dependency-safe order using
      * the specified callback function and concurrency settings.
@@ -197,22 +197,22 @@ export class DAG {
      *   });
      */
     forEach(callback, finish, concurrency = 5) {
-        
+
         if (!isFunction(callback)) {
             throw new Error(Errors.EXPECTED_FUNCTION_CALLBACK);
         }
-        
+
         if (!isInteger(concurrency) || !gt(concurrency, 0)) {
             throw new Error(Errors.EXPECTED_POSITIVE_CONCURRENCY);
         }
-        
+
         let root = data.get(this),
             queue = concat(root.children),
             total = root.size(),
             finished = false,
             numRun = 0,
             active = 0,
-            
+
             done = err => {
                 if (!finished) {
                     finished = true;
@@ -221,7 +221,7 @@ export class DAG {
                     }
                 }
             },
-            
+
             getNext = node => {
                 return err => {
                     numRun++;
@@ -230,18 +230,18 @@ export class DAG {
                         return done(err);
                     }
                     if (!gt(total, numRun)) {
-                        return done();
+                        return isEqual(0, active) && done();
                     }
                     queue = concat(queue, node.children);
                     processNext();
                 };
             },
-            
+
             processNext = () => {
 
                 queue.sort((a, b) => a.value.index - b.value.index);
                 queue.splice(0, concurrency - active).forEach(node => {
-                    
+
                     if (finished) {
                         return;
                     }
@@ -263,9 +263,9 @@ export class DAG {
                 });
 
             };
-        
+
         processNext();
-        
+
     }
-    
+
 }

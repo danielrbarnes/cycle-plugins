@@ -77,26 +77,31 @@ export class Plugins {
             update();
         }
     }
-    
+
     /**
      * Makes a Plugin unavailable to consumers.
      * @function Plugins#unregister
      * @alias Plugins.remove
-     * @param {Plugin} plugin A single Plugin to make unavailable
-     *  to consumers.
+     * @param {Plugin | Plugin[]} plugin A single Plugin or
+     *  array of Plugin instances to unregister.
      * @example
      * var plugin = new Plugin({name: 'temp'});
      * Plugins.register(plugin); // available to consumers
      * Plugins.unregister(plugin); // unavailable to consumers
      */
-    static unregister(plugin) {
-        if (!items.has(plugin)) {
-            return;
+    static unregister(...plugins) {
+        let anyRemoved = false;
+        flattenDeep(plugins)
+            .filter(plugin => items.has(plugin))
+            .forEach(plugin => {
+                anyRemoved = true;
+                items.delete(plugin);
+            });
+        if (anyRemoved) {
+            update();
         }
-        items.delete(plugin);
-        update();
     }
-    
+
     /**
      * Returns an Observable populated with an array of
      * Plugin instances matching the specified criteria.
@@ -176,12 +181,12 @@ export class Plugins {
             });
         }).distinctUntilChanged(identity, isEqualWith);
     }
-    
+
     static clear() {
         items.clear();
         update();
     }
-    
+
 }
 
 Plugins.add = Plugins.register;

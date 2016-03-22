@@ -29,7 +29,7 @@ export const Errors = {
     INVALID_INDEX: 'Property `index` must be a number.',
     INVALID_AFTER: 'Property `after` must be an array of non-empty strings.',
     INVALID_TARGET: 'Property `targetType` must be a class or string.',
-    INVALID_FILTER: 'Property `filter` must be an object with any, all, and none arrays.',
+    INVALID_FILTER: 'Property `filter` must be an object with any and none arrays.',
     INVALID_CRITERIA_TARGET: 'Criteria `targetType` cannot be a string.'
 };
 
@@ -51,7 +51,7 @@ export const isFilterMatch = (filter, criteria) => {
 };
 
 export const is = Type => item => {
-    
+
     /*
      * item     Type        result
      * ======== =========== =======
@@ -66,16 +66,16 @@ export const is = Type => item => {
      * Type     instance    is(Type.constructor)(item)
      * Type     TypeName    is(global[Type])(item)
      */
-    
+
     if (/* jshint -W041 */ item == null) {
         return false;
     }
-    
+
     let keyType = isString(Type) ? 'string' : isFunction(Type) ? 'function' : 'object',
         keyItem = isString(item) ? 'string' : isFunction(item) ? 'function' : 'object';
-    
+
     return logicTable [keyItem] [keyType] (item, Type);
-    
+
 };
 
 const getType = Name => {

@@ -2,7 +2,7 @@
 Provides observable-based plugins to cycle.js applications.
 
 ## Installation
-`npm i cycle-store --save`
+`npm i cycle-plugins --save`
 
 ## Scripts
 NOTE: Make sure you've installed all dependencies using `npm install` first.
