@@ -58,7 +58,7 @@ class Node {
             return this;
         }
         return this.children.reduce((result, child) => {
-            return child.findByName(name) || result;
+            return result || child.findByName(name);
         }, undefined);
     }
 
@@ -67,7 +67,7 @@ class Node {
             return this;
         }
         return this.children.reduce((result, child) => {
-            return child.find(node) || result;
+            return result || child.find(node);
         }, undefined);
     }
 
