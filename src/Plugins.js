@@ -71,7 +71,7 @@ export class Plugins {
             .forEach(plugin => {
                 anyAdded = true;
                 items.add(plugin);
-                plugin.on(Plugin.CHANGED, update);
+                plugin.on(Plugin.Events.PLUGIN_CHANGED, update);
             });
         if (anyAdded) {
             update();
@@ -82,8 +82,8 @@ export class Plugins {
      * Makes a Plugin unavailable to consumers.
      * @function Plugins#unregister
      * @alias Plugins.remove
-     * @param {Plugin | Plugin[]} plugin A single Plugin or
-     *  array of Plugin instances to unregister.
+     * @param {Plugin | Plugin[]} plugins One or more Plugin
+     *  instances to unregister.
      * @example
      * var plugin = new Plugin({name: 'temp'});
      * Plugins.register(plugin); // available to consumers

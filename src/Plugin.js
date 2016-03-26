@@ -10,6 +10,7 @@ import {
     flow,
     trim,
     uniq,
+    extend,
     assign,
     negate,
     conforms,
@@ -178,9 +179,19 @@ export class Plugin extends Broker {
         this.filter.any = uniq(this.filter.any);
         this.filter.none = uniq(this.filter.none);
     }
-    
-    static get CHANGED() {
-        return 'plugin-changed';
+
+    /**
+     * Events specific to Plugins.
+     * @member Plugin.Events
+     * @type {Object}
+     * @property {String} PLUGIN_CHANGED A property on the plugin has changed.
+     *  Emit this event when you wish for any search criteria passed to
+     *  Plugins.get to be re-evaluated, with observers notified of any changes.
+     */
+    static get Events() {
+        return extend({
+            PLUGIN_CHANGED: 'plugin-changed'
+        }, super.Events);
     }
 
 }

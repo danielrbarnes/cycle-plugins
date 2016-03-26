@@ -11,20 +11,20 @@ var lib = require('../index'),
     _ = require('lodash');
 
 describe('Plugins', function() {
-    
+
     afterEach(function clearPlugins() {
         Plugins.clear();
     });
-    
+
     it('has expected static methods', function() {
         ['get', 'register', 'unregister', 'add', 'remove', 'clear']
             .forEach(function(method) {
                 expect(Plugins[method]).to.be.a('function');
             });
     });
-    
+
     describe('register', function() {
-        
+
         it('is alias of add', function() {
             expect(Plugins.register).to.equal(Plugins.add);
         });
@@ -38,7 +38,7 @@ describe('Plugins', function() {
                 expect(plugins[1]).to.equal(b);
             }).unsubscribe();
         });
-        
+
         it('flattens Plugin arguments', function() {
             var a = new Plugin({name: 'a'}),
                 b = new Plugin({name: 'b'});
@@ -48,7 +48,7 @@ describe('Plugins', function() {
                 expect(plugins[1]).to.equal(b);
             }).unsubscribe();
         });
-        
+
         it('accepts multiple Plugin arguments', function() {
             var a = new Plugin({name: 'a'}),
                 b = new Plugin({name: 'b'});
@@ -58,7 +58,7 @@ describe('Plugins', function() {
                 expect(plugins[1]).to.equal(b);
             }).unsubscribe();
         });
-        
+
         it('ignores non-Plugin arguments', function() {
             var a = new Plugin({name: 'a'}),
                 b = new Plugin({name: 'b'});
@@ -68,7 +68,7 @@ describe('Plugins', function() {
                 expect(plugins[1]).to.equal(b);
             }).unsubscribe();
         });
-        
+
         it('ignores duplicate Plugins', function() {
             var a = new Plugin({name: 'a'}),
                 b = new Plugin({name: 'b'});
@@ -92,13 +92,13 @@ describe('Plugins', function() {
         });
 
     });
-    
+
     describe('unregister', function() {
-        
+
         it('is alias of remove', function() {
             expect(Plugins.unregister).to.equal(Plugins.remove);
         });
-        
+
         it('updates subscribers if plugin registered', function() {
             var index = 0,
                 counts = [2, 1],
@@ -112,7 +112,7 @@ describe('Plugins', function() {
             expect(index).to.equal(counts.length);
             token.unsubscribe();
         });
-        
+
         it('does nothing if plugin was not registered', function() {
             var index = 0,
                 counts = [1],
@@ -126,11 +126,11 @@ describe('Plugins', function() {
             expect(index).to.equal(counts.length);
             token.unsubscribe();
         });
-    
+
     });
-    
+
     describe('get', function() {
-        
+
         beforeEach(function setUpSubs() {
             this.subs = [];
         });
@@ -142,15 +142,15 @@ describe('Plugins', function() {
                 sub = this.subs.shift();
             }
         });
-        
+
         function setUpCallback(context, criteria, callback) {
             context.subs.push(Plugins.get(criteria).subscribe(_.bind(callback, context)));
         }
-        
+
         it('returns Observable', function() {
             expect(Plugins.get()).to.respondTo('subscribe');
         });
-        
+
         it('result is array', function() {
             Plugins.add(
                 new Plugin({name: 'a'}),
@@ -173,21 +173,21 @@ describe('Plugins', function() {
                 expect(_.map(plugins, 'name')).to.eql(['b', 'a', 'd', 'c']);
             });
         });
-        
+
         it('result array has toDAG method', function() {
             setUpCallback(this, undefined, function onNext(plugins) {
                 expect(plugins).to.respondTo('toDAG');
             });
             Plugins.add(new Plugin({name: 'test'}));
         });
-        
+
         it('result.toDAG returns DAG instance', function() {
             setUpCallback(this, undefined, function onNext(plugins) {
                 expect(plugins.toDAG()).to.be.an.instanceof(DAG);
             });
             Plugins.add(new Plugin({name: 'test'}));
         });
-        
+
         it('filters by name', function() {
             Plugins.add(
                 new Plugin({name: 'a'}),
@@ -199,7 +199,7 @@ describe('Plugins', function() {
                 expect(plugins[0].name).to.equal('b');
             });
         });
-        
+
         it('filters by enabled', function() {
             Plugins.add(
                 new Plugin({name: 'a', enabled: true}),
@@ -210,7 +210,7 @@ describe('Plugins', function() {
                 expect(plugins[0].name).to.equal('b');
             });
         });
-        
+
         it('default filter returns enabled or disabled', function() {
             Plugins.add(
                 new Plugin({name: 'a', enabled: true}),
@@ -233,7 +233,7 @@ describe('Plugins', function() {
                 expect(plugins[0]).to.be.an.instanceof(ChildPlugin);
             });
         });
-        
+
         it('filters by baseType string', function() {
             Plugins.add(
                 new Plugin({name: 'a'}),
@@ -244,7 +244,7 @@ describe('Plugins', function() {
                 expect(plugins[0]).to.be.an.instanceof(ChildPlugin);
             });
         });
-        
+
         it('filters by targetType', function() {
             var a = new Plugin({name: 'a', targetType: Error}),
                 b = new Plugin({name: 'b', targetType: SyntaxError}),
@@ -260,13 +260,13 @@ describe('Plugins', function() {
                 });
             });
         });
-        
+
         it('throws if targeType is a string', function() {
             expect(function() {
                 Plugins.get({targetType: 'Plugin'});
             }).to.throw(Errors.INVALID_CRITERIA_TARGET);
         });
-        
+
         it('filters by filter.any', function() {
             var a = new Plugin({name: 'a', filter: {any: ['a', 'b']}}),
                 b = new Plugin({name: 'b', filter: {any: ['b', 123]}}),
@@ -282,7 +282,7 @@ describe('Plugins', function() {
                 });
             });
         });
-                
+
         it('filters by filter.none', function() {
             var a = new Plugin({name: 'a', filter: {none: ['a', 'b']}}),
                 b = new Plugin({name: 'b', filter: {none: ['b', 123]}}),
@@ -305,7 +305,7 @@ describe('Plugins', function() {
                 });
             });
         });
-        
+
         it('updates subscribers only when new matching plugins registered', function() {
             var pluginsSeen = [];
             setUpCallback(this, {filter: 1}, function(plugins) {
@@ -323,7 +323,7 @@ describe('Plugins', function() {
             Plugins.add(new Plugin({name: 'e', filter: {any: [1]}}));
             expect(pluginsSeen.length).to.equal(2);
         });
-        
+
         it('updates subscribers when plugin changed', function() {
             var index = 0,
                 lengths = [1, 0],
@@ -333,9 +333,9 @@ describe('Plugins', function() {
             });
             Plugins.add(a);
             a.enabled = false;
-            a.emit(Plugin.CHANGED, 'enabled', true, false);
+            a.emit(Plugin.Events.PLUGIN_CHANGED, 'enabled', true, false);
         });
 
     });
-    
+
 });
