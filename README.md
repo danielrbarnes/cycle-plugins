@@ -2,7 +2,7 @@
 Provides observable-based plugins to cycle.js applications.
 
 ## Installation
-`npm i cycle-store --save`
+`npm i cycle-plugins --save`
 
 ## Scripts
 NOTE: Make sure you've installed all dependencies using `npm install` first.
@@ -20,7 +20,7 @@ Static class for registering and consuming Plugininstances dynamically.
 
 * [Plugins](#Plugins) : <code>object</code>
     * [.register(plugins)](#Plugins+register)
-    * [.unregister(plugin)](#Plugins+unregister)
+    * [.unregister(plugins)](#Plugins+unregister)
     * [.get(criteria)](#Plugins+get)
 
 <a name="Plugins+register"></a>
@@ -38,14 +38,14 @@ Makes one or more Plugins available to consumers.
 Plugins.register(new Plugin({  name: 'console',  log: function log(msg) { ... }}));Plugins.get({name: 'console'}).first()  .tap(console => console.log('hello'));
 ```
 <a name="Plugins+unregister"></a>
-### plugins.unregister(plugin)
+### plugins.unregister(plugins)
 Makes a Plugin unavailable to consumers.
 
 **Kind**: instance method of <code>[Plugins](#Plugins)</code>  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| plugin | <code>[Plugin](#Plugin)</code> | A single Plugin to make unavailable  to consumers. |
+| plugins | <code>[Plugin](#Plugin)</code> &#124; <code>[Array.&lt;Plugin&gt;](#Plugin)</code> | One or more Plugin  instances to unregister. |
 
 **Example**  
 ```js
@@ -100,6 +100,11 @@ Returns an Observable populated with an array ofPlugin instances matching the s
 | targetType | <code>function</code> | <code>Object</code> | Used in  conjunction with Plugins.get to ensure both Plugin  creators and Plugin consumers agree on who can  consume this Plugin instance. |
 | filter | <code>[Filter](#Filter)</code> | <code>{any:[], none:[]}</code> | A  way to restrict the list of Plugins retrieved by  Plugins.get at runtime. |
 
+
+* [Plugin](#Plugin)
+    * [new Plugin(props)](#new_Plugin_new)
+    * [.Events](#Plugin.Events) : <code>Object</code>
+
 <a name="new_Plugin_new"></a>
 ### new Plugin(props)
 An extensible object.
@@ -113,6 +118,17 @@ An extensible object.
 ```js
 import {extend, matches} from 'lodash';const COMMAND_PROPS = { ... };class Command extends Plugin  constructor(props) {    super(extend({}, COMMAND_PROPS, props));    Plugins.register(this);  }  execute() {}  undo() {}}class RecordCommand extends Command {  constructor(props) {    super({      targetType: Record,      enabled: User.hasPrivilege(props.name)    });  }}class SaveRecord extends RecordCommand  constructor() {    super({name: 'save-record');  }  execute() { ... }  undo() { ... }}class DeleteRecord extends RecordCommand  constructor() {    super({name: 'delete-record');  }  execute() { ... }  undo() { ... }}class Record extends Broker {  constructor() {    this.commands$ = Plugins.get({      baseType: RecordCommand,      targetType: Record,      enabled: true    });  }  save() {    return this.commands$      .filter(matches({name: 'save-record'}))      .map(command => command.execute(this))      .tap(() => this.emit('record-saved'))      .toPromise();  }}
 ```
+<a name="Plugin.Events"></a>
+### Plugin.Events : <code>Object</code>
+Events specific to Plugins.
+
+**Kind**: static property of <code>[Plugin](#Plugin)</code>  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| PLUGIN_CHANGED | <code>String</code> | A property on the plugin has changed.  Emit this event when you wish for any search criteria passed to  Plugins.get to be re-evaluated, with observers notified of any changes. |
+
 
 ### DAG (Directed Acyclic Graph)
 **Kind**: global class  

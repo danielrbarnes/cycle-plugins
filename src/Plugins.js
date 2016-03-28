@@ -154,7 +154,7 @@ export class Plugins {
         }
         return new Observable(function PluginObservable(observer) {
             let firstTime = true;
-            subject.subscribe(plugins => {
+            return subject.subscribe(plugins => {
                 let result = plugins.filter(plugin => {
                     let {name, filter, enabled, targetType} = plugin,
                         matchesName = overSome(
