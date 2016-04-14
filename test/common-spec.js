@@ -7,7 +7,7 @@ describe('common', function() {
     
     describe('is', function() {
 
-        var is = require('../build/common.js').is,
+        var is = require('../dist/common.js').is,
             error = new Error(),
             syntaxError = new SyntaxError();
         
@@ -38,7 +38,7 @@ describe('common', function() {
     
     describe('isFilterMatch', function() {
         
-        var isFilterMatch = require('../build/common.js').isFilterMatch,
+        var isFilterMatch = require('../dist/common.js').isFilterMatch,
             any = {any: ['a', 'b', 'c']},
             none = {none: ['a', 'b', 'c']};
         

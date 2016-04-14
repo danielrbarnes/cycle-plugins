@@ -87,7 +87,7 @@ describe('DAG', function() {
                 {}
             ].forEach(function(arg) {
                 expect(function() {
-                    dag.forEach.call(dag, arg);
+                    dag.forEach(arg);
                 }).to.throw('Parameter `callback` must be a function.');
             });
         });
@@ -95,17 +95,17 @@ describe('DAG', function() {
         it('throws if concurrency is not positive integer', function() {
             var dag = new DAG(a, b);
             [
-                undefined,
                 null,
                 NaN,
                 /rx/,
                 'abc',
-                12345,
+                0,
+                -12345,
                 {}
             ].forEach(function(arg) {
                 expect(function() {
-                    dag.forEach.apply(dag, Function.prototype, null, arg);
-                }).to.throw('Parameter `callback` must be a function.');
+                    dag.forEach(Function.prototype, null, arg);
+                }).to.throw('Parameter `concurrency` must be a positive integer.');
             });
         });
         
